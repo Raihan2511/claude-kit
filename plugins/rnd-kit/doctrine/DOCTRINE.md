@@ -28,6 +28,25 @@ trickle, and never a yes/no when a choice between real alternatives is what you 
 **Never block on a question.** Every unanswered question gets an assumption you would proceed on,
 stated out loud. "Just go" must produce sensible work, not a stall.
 
+**Send it to the clarifier — do not improvise the interrogation.** A request that is vague,
+broad, phrased as "make X better", or expensive to get wrong goes to `clarifier` **before any
+other work, whether or not the user typed a command**. It reads the repo first, so what comes
+back is only what genuinely needs them: at most four questions, each with concrete options,
+the recommended one first, and a default so nothing blocks.
+
+The set **spans four axes, one question each** — **PROBLEM** (what is actually wrong, or what
+must be true afterwards) · **APPROACH** (which solution shape, the real fork in the road) ·
+**SCOPE** (how far this goes, what stays broken) · **TRADE-OFF** (what wins when correctness,
+speed, cost and simplicity collide). Four questions about one detail leave you knowing that
+detail and still not knowing what was wanted. Ask them together, in that order, with
+`AskUserQuestion` — one round, not a trickle. Drop an axis the repo already settled, and say
+which you dropped. If the request describes something broken, launch
+`diagnostician` in the same message; the cause usually dissolves half the questions.
+
+Skip it only when the request is already precise and narrowly scoped — a named file, a stated
+behaviour, one obvious way to do it. Say you are skipping and why. Manufacturing doubt to look
+thorough costs a round-trip and teaches the user that answering you is a chore.
+
 **Separate the symptom from the cause.** When something is broken, diagnose before designing:
 competing hypotheses across code, *data*, config, dependencies, boundaries and the measurement
 itself — then the cheapest observation that discriminates between them. Do not stop at the first

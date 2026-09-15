@@ -20,9 +20,24 @@ problem, and knowing the cause often dissolves half the questions.
 
 ## 2 · Ask — properly
 
-Take the clarifier's question set and put it to the user with `AskUserQuestion`:
+Take the clarifier's question set and put it to the user with `AskUserQuestion`. The set is
+built to span four axes, and that spread is the point — four questions about one detail leave
+you knowing that detail and still not knowing what the user wants:
 
-- At most four questions in one round. Not four rounds of one.
+| Axis | Settles |
+|---|---|
+| **PROBLEM** | what is actually wrong, or what must be true afterwards |
+| **APPROACH** | which solution shape they want — the real fork in the road |
+| **SCOPE** | how far this goes, and what stays broken on purpose |
+| **TRADE-OFF** | what wins when correctness, speed, cost and simplicity collide |
+
+- **Ask them together, in axis order**, in one round. Not four rounds of one, and not one
+  question when three axes are still open.
+- At most one question per axis. If the clarifier returns two from the same axis, that is a bug
+  in the set — send it back rather than spending a round on it.
+- Fewer than four is fine when the repo already settled an axis. The clarifier reports which it
+  dropped and why in `AXES-DROPPED`; relay that, so the user can correct an axis you closed
+  wrongly.
 - Every option is a **concrete choice** with a real consequence, never "yes / no / not sure".
 - The recommended option goes first, marked `(Recommended)`. You are expected to have an opinion.
 - Where the options are structural — two designs, two output shapes, two schemas — use the
