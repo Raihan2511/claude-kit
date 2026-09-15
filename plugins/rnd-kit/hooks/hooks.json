@@ -1,0 +1,28 @@
+{
+  "description": "Load the portable working agreement at session start, and ask before anything costly, slow, live or destructive runs",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/inject-doctrine.py\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"${CLAUDE_PLUGIN_ROOT}/hooks/gate-costly-runs.py\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
