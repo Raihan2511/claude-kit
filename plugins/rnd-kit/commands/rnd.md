@@ -84,7 +84,8 @@ do not let a builder cross into another's files.
 Two or more lanes → `integrator`, always. One lane → skip it. The integrator fixes the seams and
 gets the whole tree through every **cheap** check (lint, types, unit tests).
 
-Then `/code-review` the combined diff if the change is non-trivial.
+**Do not review here.** The review gate is Phase 7, after verification, and it is the user's
+call — not something this phase triggers on its own.
 
 ## Phase 6 · Verify — ⛔ THE GATE
 
@@ -103,7 +104,53 @@ Relay it to the user and ask with `AskUserQuestion`:
 Never skip the gate because the change looks safe, because the user seemed to be in a hurry, or
 because they approved a harness run earlier in the session. Each run is its own consent.
 
-## Phase 7 · Close
+## Phase 7 · Review — ⛔ THE REVIEW GATE
+
+Implementation and validation are done. The change is *ready* for review — which is not the same
+as reviewing it.
+
+**Invoke `review-gate` first.** It reads the diff, checks whether the work is actually finished,
+runs the project's cheap checks, and decides whether a review is worth running *now* and at what
+scope. It runs no review itself and returns `GATE: awaiting user confirmation`.
+
+Its recommendation comes back as one of four, and you relay it honestly rather than always
+asking the same question:
+
+| It says | You do |
+|---|---|
+| **review now** | ask the question below |
+| **fix first** | report what fails the cheap checks; a review of a tree failing its own type check is spent on noise. Offer to fix, then re-gate |
+| **not yet** | report what looks unfinished, with `file:line`. Do not ask about reviewing |
+| **not worth it** | say why — trivial, generated, already reviewed — and go to Phase 8 |
+
+When it says **review now**, ask with `AskUserQuestion`:
+
+> Implementation and validation are complete. The changes are ready for code review.
+> **Would you like me to run the code review?**
+
+- **Yes** → run `/code-review` at the effort `review-gate` proposed, on the current diff, and
+  relay the findings.
+- **Yes, security too** → offer this option **only** when `review-gate` named the `file:line`
+  that triggers it. Run `/security-review` as well.
+- **No, I'll review it myself** → say fine and go to Phase 8. Do not argue, do not run a
+  "quick partial check anyway", and do not list what the review *would* have found. A user who
+  reviews their own diff is doing the right thing.
+
+Rules for this gate:
+
+- **The main session runs the review, not the agent.** `/code-review` and `/security-review` are
+  skills and load here; a subagent cannot invoke them. `review-gate` judges and proposes only.
+- **Never run a review because the diff looks risky.** That is the reasoning that turns a gate
+  into a formality. If it genuinely needs one, say why in one sentence *inside the question* —
+  then accept the answer.
+- **Do not chain reviews.** One yes runs one review pass. A follow-up review after fixes is a
+  new question.
+- **Do not review your own work silently** as part of "closing out". Phase 8 reports; it does not
+  inspect.
+- The reviewers are unmodified — `/code-review` and `/security-review` are the built-in skills.
+  This gate decides *whether* they run, never *how* they work.
+
+## Phase 8 · Close
 
 Report, in this order: what changed and where · what is verified and by which check · what is
 **not** verified · what you noticed and deliberately did not do · the obvious next step.
