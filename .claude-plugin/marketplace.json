@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "raihan-kit",
+  "description": "Raihan's Claude Code toolkit: divide-and-conquer agents, research and build pipelines, and a gate that stops anything costly from starting on its own",
+  "owner": {
+    "name": "Raihan Uddin"
+  },
+  "plugins": [
+    {
+      "name": "rnd-kit",
+      "description": "Research-decide-build pipeline: 11 agents, 8 commands, 3 workflows, a portable working agreement injected into every session, and a PreToolUse gate on costly, slow, live or destructive commands.",
+      "source": "./plugins/rnd-kit",
+      "category": "development"
+    }
+  ]
+}
