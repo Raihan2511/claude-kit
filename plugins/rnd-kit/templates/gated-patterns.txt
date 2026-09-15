@@ -1,0 +1,16 @@
+# Project-specific gate rules for rnd-kit's gate-costly-runs.py.
+# Copy to <project>/.claude/gated-patterns.txt and edit. The file is optional.
+#
+# One rule per line: a regex matched (case-insensitively) anywhere in the Bash command
+# string, optionally followed by `# reason`. Matching anywhere is the point — it catches
+# `cd /repo && ...`, `bash -c "..."`, env prefixes and pipes, which a prefix rule misses.
+#
+# These are checked BEFORE the built-in free-checks allow-list, so a rule here can gate
+# something the kit would otherwise wave through.
+
+# --- examples: delete these and write your own -------------------------------------
+# \bmake\s+(site|scrape|load)\b            # mutates the search index
+# \bpython3?\s+eval/\w+\.py\b              # eval harness — live index, real API spend
+# \b(npm|pnpm|yarn)\s+run\s+e2e\b          # browser suite, several minutes
+# \bpytest\s*$                             # the whole suite with no path filter
+# \bdbt\s+run\b                            # rebuilds warehouse models
