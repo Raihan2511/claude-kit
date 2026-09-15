@@ -8,8 +8,8 @@ It changes how work gets organised. It never changes your project's code on its 
 
 ```
 rnd-kit/
-├── agents/               eleven specialists, one job each
-├── commands/             eight entry points you invoke with /
+├── agents/               thirteen specialists, one job each
+├── commands/             nine entry points you invoke with /
 ├── workflows/            deterministic multi-agent orchestration for when depth matters
 ├── hooks/                enforcement that does not depend on a model reading prose
 ├── doctrine/DOCTRINE.md  the working agreement, injected into every session
@@ -17,11 +17,13 @@ rnd-kit/
 ```
 
 Install it once and every repo on the machine has it — no `.claude/` folder required in any of
-them. See the [repo README](../../README.md) for install.
+them. See the [repo README](../../README.md) for install, and
+[docs/HOW-IT-WORKS.md](../../docs/HOW-IT-WORKS.md) for the diagrams of how a problem flows
+through the agents.
 
 ---
 
-## The eight commands
+## The nine commands
 
 | Command | Use it when | Ends with |
 |---|---|---|
@@ -30,6 +32,7 @@ them. See the [repo README](../../README.md) for install.
 | `/rnd <problem>` | the full pipeline: a real problem with real unknowns | a built, integrated change + a harness offer |
 | `/recon <question>` | you want to *know*, not to change anything | a graded, source-backed answer |
 | `/lanes <task>` | the approach is settled; you want it built fast | an integrated change + a harness offer |
+| `/setup [path]` | you just cloned this and want it running | a working checkout, verified by real checks, and a `SETUP.md` |
 | `/harness [what]` | **you are ready to test** | numbers, and what they do and do not mean |
 | `/commit [context]` | the work is done and should be recorded | a sequence of small commits you approved, each ≤130 words — pushed only if you said so |
 | `/port-setup [path]` | a repo should tell the kit what it is | that repo's `CLAUDE.md`, written from its own evidence |
@@ -40,14 +43,15 @@ time → skeptics try to kill each finding → the architect commits to one opti
 builders run those lanes concurrently in files that cannot overlap → the integrator fixes the
 seams → you get asked about testing.
 
-It stops for you at exactly three points: **is this the right problem**, **approve the plan**, and
-**run the harness?** Everywhere else it runs without pestering you.
+It stops for you at exactly four points: **is this the right problem**, **approve the plan**,
+**run the harness?**, and **run the code review?** Everywhere else it runs without pestering you.
+Nothing costly and nothing outward-facing happens between those stops.
 
-## The eleven agents
+## The thirteen agents
 
 | Agent | Owns | Can edit? |
 |---|---|---|
-| `clarifier` | what the problem *is* — resolves from the repo, asks only what changes the work | no |
+| `clarifier` | what the problem *is* — resolves from the repo, asks only what changes the work; **fires on any vague request, no command needed** | no |
 | `diagnostician` | why it is broken — competing hypotheses, discriminating evidence, root cause | no |
 | `scout-repo` | how our code behaves *now* — real call path, seams, tests, blast radius | no |
 | `scout-web` | the outside world — docs, specs, GitHub source, issues, prior art, benchmarks | no |
@@ -55,6 +59,8 @@ It stops for you at exactly three points: **is this the right problem**, **appro
 | `builder` | exactly one lane, inside its own files only | yes, in its lane |
 | `integrator` | the seams between lanes — the bugs that exist only *between* correct pieces | yes |
 | `refuter` | destroying claims; a finding that survives it is worth acting on | no |
+| `setup-runner` | getting a cloned repo running — toolchain, containers, env, frontend; **never repairs** | setup only |
+| `review-gate` | whether a review is worth running **now**, and at what scope — never runs one | no |
 | `harness-runner` | **the only agent allowed to run an eval, benchmark or live test** | reports only |
 | `committer` | **the only agent allowed to commit or push** — splits the change into a sequence, then waits | git only |
 | `scribe` | documents in this repo's voice; never invents a number | docs only |
@@ -62,6 +68,44 @@ It stops for you at exactly three points: **is this the right problem**, **appro
 **No agent hardcodes a project fact.** They read them from the project's own `CLAUDE.md`, which
 is the single property that makes one installed copy work in every repo. If you ever want to edit
 an agent for a specific project, that fact belongs in that project's `CLAUDE.md` instead.
+
+## It asks before it guesses
+
+You do not have to type anything for this. Doctrine §A0 routes any request that is vague, broad,
+phrased as "make X better", or expensive to get wrong to `clarifier` **before any other work
+starts** — so the questions arrive whether or not you reached for a command.
+
+`clarifier` reads the repo first and answers everything the code can answer, so what reaches you
+is only what genuinely needs you: **at most four questions in one round**, each with two to four
+concrete options, the recommended one first, and a default so nothing ever blocks. Options are
+real choices — *"rewrite the chunker"* vs *"add a post-processing pass"* — never "yes / no / not
+sure". Where the choice is structural, they arrive as side-by-side previews.
+
+**The set spans four axes, one question each** — because four questions about one detail leave
+you knowing that detail and still not knowing what was wanted:
+
+| Axis | Settles | Asked as |
+|---|---|---|
+| **PROBLEM** | what is actually wrong, or what must be true afterwards | two readings of the request |
+| **APPROACH** | which solution shape you want — the real fork in the road | two or three concrete designs |
+| **SCOPE** | how far this goes, what stays broken on purpose | narrow / plus-the-neighbour / broad |
+| **TRADE-OFF** | what wins when correctness, speed, cost and simplicity collide | the priorities, named |
+
+They come in that order, because you cannot pick an approach to a problem nobody has agreed on
+yet. Never two questions from the same axis. An axis the repo already settled is dropped and
+reported as dropped — so you can correct one it closed wrongly.
+
+Its test for whether something earns a question: **do two different answers lead to materially
+different work?** If not it is curiosity, and it gets dropped and listed as an assumption
+instead. A question whose answer would be ignored is worse than no question.
+
+It skips itself when a request is already precise — a named file, a stated behaviour, one obvious
+way to do it — and says so. Manufacturing doubt to look thorough costs a round-trip.
+
+`/clarify <request>` runs it deliberately and ends with a written brief (problem · real-goal ·
+done-when · constraints · scope · assumptions · unknowns · next). It is also Phase 0 of `/rnd`,
+and pairs with `diagnostician` when the request mentions something broken — the cause usually
+dissolves half the questions.
 
 ## The doctrine
 
@@ -157,6 +201,47 @@ repo's own costly commands, drop a file at `.claude/gated-patterns.txt`:
 One regex per line, matched anywhere in the command string, `# reason` optional. The file is
 optional; project rules are checked before the built-in free-checks allow-list, so a rule here
 can gate something the kit would otherwise wave through. Template in `templates/`.
+
+---
+
+## Getting a cloned repo running
+
+`/setup` answers the question every fresh clone asks: *what do I have to do to make this work?*
+
+`setup-runner` reads the repo **CI config first** — that is the setup which demonstrably works on
+a clean machine every day, while a README can rot for a year without anyone noticing. When the two
+disagree, it trusts CI and tells you they disagree. Then it measures the machine rather than
+assuming it: which tools are installed and at what version, which ports are already taken, whether
+a `.env` exists that must not be overwritten.
+
+It comes back with **every way the project can come up** — containers, local toolchain,
+devcontainer — what each costs in time and disk, and **one recommendation with the reasoning**:
+
+> **Docker Compose (Recommended)** — CI uses this path and Docker is already running; the local
+> path needs Python 3.12 and you have 3.11. ~4 min, 2.1 GB.
+
+Not "recommended because it is standard". You pick; its job is to make the choice obvious.
+
+Three rules it holds to:
+
+- **It surveys first and runs nothing** until you confirm with `SETUP: CONFIRMED` naming a path.
+  The token alone leaves it in survey mode, on purpose.
+- **It never repairs anything.** A failed step returns the verbatim error, the traced cause, the
+  exact fix, what that fix would touch — and **whether it genuinely needs fixing at all**, or is
+  cosmetic, optional, or only affects a feature you may not want. You decide; you apply it.
+- **It proves the setup rather than asserting it.** "Exited 0" is not verification, so it hits the
+  health endpoint, loads the frontend, queries the database for tables, runs the fast suite. Every
+  check it *skipped* is reported as skipped — silence reading as "passed" is a lie by omission.
+
+Secrets are listed **by variable name and destination only**, never read, printed or invented — a
+plan that silently omits a required key sends you into a failure you cannot diagnose.
+
+Afterwards it can leave a `SETUP.md` behind, written from what actually ran and worked rather than
+what was planned, so the next person skips the investigation. It never overwrites an existing
+setup doc without showing you what would be lost.
+
+**Not the same as `/port-setup`**, which teaches the *kit* about a repo by writing its `CLAUDE.md`.
+`/setup` gets the *project* running for a human. A fresh clone usually wants `/setup` first.
 
 ---
 

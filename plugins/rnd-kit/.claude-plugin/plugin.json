@@ -1,7 +1,7 @@
 {
   "name": "rnd-kit",
   "version": "1.0.0",
-  "description": "A divide-and-conquer working kit for Claude Code. Eleven agents (clarify, diagnose, scout, refute, architect, build, integrate, harness, commit, scribe), eight commands, three parallel workflows, a doctrine loaded into every session, and a four-layer gate so no eval, benchmark, deploy, commit or push ever happens without you saying yes.",
+  "description": "A divide-and-conquer working kit for Claude Code. Thirteen agents (clarify, diagnose, scout, refute, architect, build, integrate, setup, harness, review-gate, commit, scribe), nine commands, three parallel workflows, a doctrine loaded into every session, and a four-layer gate so no eval, benchmark, deploy, commit or push ever happens without you saying yes.",
   "author": {
     "name": "Raihan Uddin"
   },

@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "rnd-kit",
-      "description": "Research-decide-build pipeline: 11 agents, 8 commands, 3 workflows, a portable working agreement injected into every session, and a PreToolUse gate on costly, slow, live or destructive commands.",
+      "description": "Research-decide-build pipeline: 13 agents, 9 commands, 3 workflows, a portable working agreement injected into every session, and a PreToolUse gate on costly, slow, live or destructive commands.",
       "source": "./plugins/rnd-kit",
       "category": "development"
     }

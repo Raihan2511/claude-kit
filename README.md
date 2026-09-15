@@ -31,10 +31,10 @@ To update later: `/plugin marketplace update raihan-kit`. To remove it:
 
 **[`rnd-kit`](plugins/rnd-kit/)** — a divide-and-conquer working kit:
 
-- **11 agents** — clarifier, diagnostician, scout-repo, scout-web, architect, builder,
-  integrator, refuter, harness-runner, committer, scribe
-- **8 commands** — `/rnd` `/recon` `/lanes` `/clarify` `/diagnose` `/harness` `/commit`
-  `/port-setup`
+- **13 agents** — clarifier, diagnostician, scout-repo, scout-web, architect, builder,
+  integrator, refuter, setup-runner, harness-runner, review-gate, committer, scribe
+- **9 commands** — `/rnd` `/recon` `/lanes` `/clarify` `/diagnose` `/setup` `/harness`
+  `/commit` `/port-setup`
 - **3 workflows** — deterministic multi-agent orchestration for recon, parallel build lanes,
   and deep review
 - **A working agreement** loaded into every session — evidence over recall, refute before you
@@ -44,6 +44,7 @@ To update later: `/plugin marketplace update raihan-kit`. To remove it:
   capped at 130 words
 
 Full documentation: **[plugins/rnd-kit/README.md](plugins/rnd-kit/README.md)**.
+How the pieces fit together, with diagrams: **[docs/HOW-IT-WORKS.md](docs/HOW-IT-WORKS.md)**.
 
 ## The model
 
